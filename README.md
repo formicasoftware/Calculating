@@ -1,5 +1,6 @@
 <img src="https://github.com/user-attachments/assets/33018197-4863-496b-991e-92d04c5ce23a" alt="icon512" width="100" height="100">
 
+
 **🌟 Browser Calculator for Google Chrome**
 This is a simple, lightweight browser calculator designed specifically for Google Chrome (not tested on other Chromium-based browsers). It is optimized for quick response and minimal resource usage.
 
@@ -19,7 +20,6 @@ To use this calculator, follow these steps:
 1. Clone the repository:
 bash
 git clone https://github.com/formicasoftware/Calculating
-
 Or download the archive and unzip it.
 
 2. Go to the project directory:
