@@ -1,4 +1,4 @@
-![icon512](https://github.com/user-attachments/assets/33018197-4863-496b-991e-92d04c5ce23a)
+<img src="https://github.com/user-attachments/assets/33018197-4863-496b-991e-92d04c5ce23a" alt="icon512" width="100" height="100">
 
 🌟 Browser Calculator for Google Chrome
 This is a simple, lightweight browser calculator designed specifically for Google Chrome (not tested on other Chromium-based browsers). It is optimized for quick response and minimal resource usage.
@@ -11,6 +11,7 @@ Key Features
 - Fast Response: Built for quick and responsive calculations.
 
 Screenshots
+
 ![image](https://github.com/user-attachments/assets/4cd32bd9-4f92-40ef-a248-6f83eb8da034)
 
 Installation
