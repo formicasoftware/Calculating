@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Calculating",
+  "version": "1.0",
+  "description": "A simple calculator Chrome extension.",
+  "author": "Formica Software",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_icon": "icon48.png",
+    "default_popup": "Calculating.html"
+  },
+  "permissions": ["activeTab"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

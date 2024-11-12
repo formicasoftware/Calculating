@@ -1,0 +1,30 @@
+Mozilla Public License Version 2.0
+==================================
+1. Definitions
+--------------
+1.1. "Contributor" means each individual or legal entity that creates, contributes to the creation of, or owns Covered Software.
+1.2. "Contributor Version" means the combination of the Contributions of others (if any) used by a Contributor and that particular Contributor's Contribution.
+1.3. "Contribution" means Covered Software of a particular Contributor.
+1.4. "Covered Software" means Source Code Form to which the initial Contributor has attached the notice in Exhibit A, the Executable Form of such Source Code Form, and Modifications of such Source Code Form, in each case including portions thereof.
+...
+2. License Grants and Conditions
+--------------------------------
+Each Contributor hereby grants You a world-wide, royalty-free, non-exclusive license:
+...
+## Additional Terms: Non-Commercial Use
+
+In addition to the terms and conditions of the Mozilla Public License 2.0, the following additional terms apply:
+
+- This software is provided for non-commercial use only. Any commercial use, including but not limited to, selling, offering for sale, or using the software for generating revenue, is strictly prohibited.
+- You may download, install, distribute, and modify the software, but only for personal, educational, or other non-commercial purposes.
+- By using this software, you agree to these additional terms and acknowledge that any commercial use will be considered a breach of this license.
+
+## Copyright Notice
+
+Copyright (c) 2024 [Formica Software]
+
+All rights reserved. This software is not affiliated with Formica Group or Broadview Holding. However, if you are using any trademarks, logos, or other intellectual property of Formica Group, please note that these are the property of Broadview Holding, the current owner of Formica Group.
+
+## Exhibit A - Source Code Form License Notice
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
