@@ -42,9 +42,6 @@ Please read the [LICENSE](LICENSE.txt) before contributing to this project.
 - Q: Is this calculator compatible with other browsers?
   - A: Currently, this calculator is designed and tested only for Google Chrome. Compatibility with other browsers is planned for future updates.
 - Q: How do I report bugs or request features?
-
-
- #ChromiumCalculator #BrowserCalculator #ChromeExtension #JavaScriptCalculator #WebCalculator #OpenSourceCalculator #FreeCalculator #LightweightCalculator #FastCalculator #MathTools #ChromeOSApps #WebDevelopment #JavaScriptProjects #HTML #CSS #JS #GitHubProjects #OpenSourceSoftware #NonCommercialUse #EducationalTools #PersonalProjects #CodingCommunity #WebApplications #ChromebookApps #MathematicsTools #SimpleCalculator #AdvancedCalculator #CalculatorApp #BrowserExtensions #DeveloperTools #TechProjects #SoftwareDevelopment
   - A: You can report bugs or request features by opening an issue on the GitHub repository.
 
 **🧾 License**
@@ -52,3 +49,6 @@ This project is licensed under the [Mozilla Public License 2.0](LICENSE.txt). Se
 
 **🤝 Acknowledgements**
 Special thanks to all contributors and users who have helped improve this project.
+
+
+ #ChromiumCalculator #BrowserCalculator #ChromeExtension #JavaScriptCalculator #WebCalculator #OpenSourceCalculator #FreeCalculator #LightweightCalculator #FastCalculator #MathTools #ChromeOSApps #WebDevelopment #JavaScriptProjects #HTML #CSS #JS #GitHubProjects #OpenSourceSoftware #NonCommercialUse #EducationalTools #PersonalProjects #CodingCommunity #WebApplications #ChromebookApps #MathematicsTools #SimpleCalculator #AdvancedCalculator #CalculatorApp #BrowserExtensions #DeveloperTools #TechProjects #SoftwareDevelopment
