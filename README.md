@@ -12,7 +12,7 @@ Key Features
 
 Screenshots
 
-![image](https://github.com/user-attachments/assets/4cd32bd9-4f92-40ef-a248-6f83eb8da034)
+<img src="https://github.com/user-attachments/assets/4cd32bd9-4f92-40ef-a248-6f83eb8da034" alt="icon512" width="200" height="293">
 
 Installation
 
