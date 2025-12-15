@@ -1,134 +1,198 @@
-// © 2024 Formica Software. Not for commercial use. All rights reserved.
+// © 2025 Formica Software. Not for commercial use. All rights reserved.
+
 const display = document.getElementById('display');
 
-let currentDisplay = '0';
 let expression = '';
-let firstValue = null;
-let operator = null;
+let shouldClearOnNext = false;
 
 function updateDisplay() {
-    if (expression) {
-        display.textContent = expression + currentDisplay;
+    if (expression === '' || expression.trim() === '-') {
+        display.textContent = '0';
     } else {
-        display.textContent = currentDisplay;
+        display.textContent = expression;
     }
 }
 
-function clearDisplay() {
-    currentDisplay = '0';
+function clearAll() {
     expression = '';
-    firstValue = null;
-    operator = null;
+    shouldClearOnNext = false;
     updateDisplay();
 }
 
-function deleteLastCharacter() {
-    if (currentDisplay.length > 1) {
-        currentDisplay = currentDisplay.slice(0, -1);
-    } else {
-        currentDisplay = '0';
+function deleteLast() {
+    if (shouldClearOnNext) {
+        clearAll();
+        return;
+    }
+
+    expression = expression.slice(0, -1).trimEnd();
+    if (expression.endsWith(' ')) {
+        expression = expression.slice(0, -2).trimEnd();
     }
     updateDisplay();
 }
 
-function appendToDisplay(value) {
-    if (currentDisplay === '0' && value !== '.') {
-        currentDisplay = value;
-    } else {
-        currentDisplay += value;
+function appendNumber(num) {
+    if (shouldClearOnNext) {
+        expression = '';
+        shouldClearOnNext = false;
     }
+    expression += num;
     updateDisplay();
 }
 
-function handlePlusMinus() {
-    if (currentDisplay !== '0') {
-        if (currentDisplay.startsWith('-')) {
-            currentDisplay = currentDisplay.slice(1);
-        } else {
-            currentDisplay = '-' + currentDisplay;
-        }
+function appendDecimal() {
+    if (shouldClearOnNext) {
+        expression = '0.';
+        shouldClearOnNext = false;
         updateDisplay();
+        return;
     }
+
+    let parts = expression.split(/[\+\-\*\/]/);
+    let lastNumber = parts[parts.length - 1].trim();
+    if (lastNumber.includes('.')) return;
+
+    expression += '.';
+    updateDisplay();
 }
 
-function handleOperator(op) {
-    if (firstValue === null) {
-        firstValue = currentDisplay;
-        operator = op;
-        expression = firstValue + ' ' + operator + ' ';
-        currentDisplay = '';
+function appendOperator(op) {
+    if (shouldClearOnNext) {
+        shouldClearOnNext = false;
     }
+
+    expression = expression.trim();
+    if (/[\+\-\*\/]$/.test(expression)) {
+        expression = expression.slice(0, -1);
+    }
+
+    expression += ' ' + op + ' ';
     updateDisplay();
 }
 
 function handlePercent() {
-    if (firstValue !== null) {
-        let percentage = (parseFloat(currentDisplay) / 100) * parseFloat(firstValue);
-        currentDisplay = percentage.toString();
-        expression = firstValue + ' - ' + percentage + ' = ';
-        updateDisplay();
-        calculateResult();
+    if (shouldClearOnNext || expression.trim() === '') return;
+
+    const match = expression.trim().match(/([+\-*\/])\s*([-\d.]+)$/);
+    if (!match) return;
+
+    const operator = match[1];
+    const percentValue = parseFloat(match[2]);
+    if (isNaN(percentValue)) return;
+
+    const beforePart = expression.substring(0, match.index).trim();
+    const baseMatch = beforePart.match(/([-\d.]+)$/);
+    if (!baseMatch) return;
+
+    const baseValue = parseFloat(baseMatch[1]);
+    if (isNaN(baseValue)) return;
+
+    const percentAmount = (baseValue * percentValue) / 100;
+    const newExpr = beforePart.substring(0, baseMatch.index) + baseValue + operator + percentAmount;
+
+    let result;
+    try {
+        const cleanExpr = newExpr.replace(/\s+/g, '');
+        result = Function('"use strict"; return (' + cleanExpr + ')')();
+        if (!isFinite(result)) throw new Error();
+    } catch (e) {
+        display.textContent = 'Error';
+        setTimeout(clearAll, 1500);
+        return;
     }
+
+    expression = result.toString();
+    shouldClearOnNext = true;
+    updateDisplay();
 }
 
-function calculateResult() {
-    if (firstValue !== null && operator !== null) {
-        let secondValue = currentDisplay;
-        let result;
+function calculate() {
+    const trimmed = expression.trim();
+    if (trimmed === '' || trimmed === '-') return;
 
-        try {
-            switch (operator) {
-                case '+':
-                    result = parseFloat(firstValue) + parseFloat(secondValue);
-                    break;
-                case '-':
-                    result = parseFloat(firstValue) - parseFloat(secondValue);
-                    break;
-                case '*':
-                    result = parseFloat(firstValue) * parseFloat(secondValue);
-                    break;
-                case '/':
-                    if (secondValue === '0') {
-                        throw new Error("Cannot divide by zero");
-                    }
-                    result = parseFloat(firstValue) / parseFloat(secondValue);
-                    break;
-                default:
-                    throw new Error("Invalid operator");
-            }
-
-            expression = '';
-            currentDisplay = result.toString();
-            firstValue = null;
-            operator = null;
-            updateDisplay();
-        } catch (e) {
-            currentDisplay = 'Error';
-            updateDisplay();
-            setTimeout(clearDisplay, 2000);
-        }
+    let result;
+    try {
+        const cleanExpr = trimmed.replace(/\s+/g, '');
+        result = Function('"use strict"; return (' + cleanExpr + ')')();
+        if (!isFinite(result)) throw new Error();
+    } catch (e) {
+        display.textContent = 'Error';
+        setTimeout(clearAll, 1500);
+        return;
     }
+
+    expression = result.toString();
+    shouldClearOnNext = true;
+    updateDisplay();
 }
 
-document.getElementById('clear').addEventListener('click', clearDisplay);
-document.getElementById('delete').addEventListener('click', deleteLastCharacter);
-document.getElementById('percent').addEventListener('click', handlePercent);
-document.getElementById('divide').addEventListener('click', handleOperator.bind(null, '/'));
-document.getElementById('seven').addEventListener('click', appendToDisplay.bind(null, '7'));
-document.getElementById('eight').addEventListener('click', appendToDisplay.bind(null, '8'));
-document.getElementById('nine').addEventListener('click', appendToDisplay.bind(null, '9'));
-document.getElementById('multiply').addEventListener('click', handleOperator.bind(null, '*'));
-document.getElementById('four').addEventListener('click', appendToDisplay.bind(null, '4'));
-document.getElementById('five').addEventListener('click', appendToDisplay.bind(null, '5'));
-document.getElementById('six').addEventListener('click', appendToDisplay.bind(null, '6'));
-document.getElementById('subtract').addEventListener('click', handleOperator.bind(null, '-'));
-document.getElementById('one').addEventListener('click', appendToDisplay.bind(null, '1'));
-document.getElementById('two').addEventListener('click', appendToDisplay.bind(null, '2'));
-document.getElementById('three').addEventListener('click', appendToDisplay.bind(null, '3'));
-document.getElementById('add').addEventListener('click', handleOperator.bind(null, '+'));
-document.getElementById('zero').addEventListener('click', appendToDisplay.bind(null, '0'));
-document.getElementById('decimal').addEventListener('click', appendToDisplay.bind(null, '.'));
-document.getElementById('equals').addEventListener('click', calculateResult);
-document.getElementById('plus_minus').addEventListener('click', handlePlusMinus);
+// Упрощённая и надёжная кнопка ±
+function handlePlusMinus() {
+    if (shouldClearOnNext) {
+        expression = '';
+        shouldClearOnNext = false;
+    }
+
+    // Находим последнее число в выражении
+    const parts = expression.split(/[\+\-\*\/]/);
+    let lastNumStr = parts[parts.length - 1].trim();
+
+    // Если последнее число пустое или только минус — ничего не делаем
+    if (lastNumStr === '' || lastNumStr === '-' || lastNumStr === '0') {
+        return;
+    }
+
+    let num = parseFloat(lastNumStr);
+
+    // Меняем знак
+    num = -num;
+
+    // Заменяем последнее число на новое со знаком
+    const newLastNumStr = num.toString();
+
+    // Собираем выражение обратно
+    expression = expression.substring(0, expression.length - lastNumStr.length) + newLastNumStr;
+
+    updateDisplay();
+}
+
+// === Кнопки ===
+document.getElementById('clear').onclick = clearAll;
+document.getElementById('delete').onclick = deleteLast;
+document.getElementById('plus_minus').onclick = handlePlusMinus;
+document.getElementById('percent').onclick = handlePercent;
+
+document.getElementById('add').onclick = () => appendOperator('+');
+document.getElementById('subtract').onclick = () => appendOperator('-');
+document.getElementById('multiply').onclick = () => appendOperator('*');
+document.getElementById('divide').onclick = () => appendOperator('/');
+
+document.getElementById('seven').onclick = () => appendNumber('7');
+document.getElementById('eight').onclick = () => appendNumber('8');
+document.getElementById('nine').onclick = () => appendNumber('9');
+document.getElementById('four').onclick = () => appendNumber('4');
+document.getElementById('five').onclick = () => appendNumber('5');
+document.getElementById('six').onclick = () => appendNumber('6');
+document.getElementById('one').onclick = () => appendNumber('1');
+document.getElementById('two').onclick = () => appendNumber('2');
+document.getElementById('three').onclick = () => appendNumber('3');
+document.getElementById('zero').onclick = () => appendNumber('0');
+document.getElementById('decimal').onclick = appendDecimal;
+
+document.getElementById('equals').onclick = calculate;
+
+// === Клавиатура ===
+document.addEventListener('keydown', (e) => {
+    if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+    if (e.key === '.') appendDecimal();
+    if (e.key === 'Backspace') deleteLast();
+    if (e.key === 'Delete' || e.key === 'Escape') clearAll();
+    if (e.key === 'Enter' || e.key === '=') calculate();
+    if (e.key === '+') appendOperator('+');
+    if (e.key === '-') appendOperator('-');
+    if (e.key === '*') appendOperator('*');
+    if (e.key === '/') { e.preventDefault(); appendOperator('/'); }
+});
 
 updateDisplay();
