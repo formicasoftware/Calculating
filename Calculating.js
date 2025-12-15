@@ -5,6 +5,54 @@ const display = document.getElementById('display');
 let expression = '';
 let shouldClearOnNext = false;
 
+function safeEvaluate(expr) {
+    if (!expr) throw new Error('Empty expression');
+    expr = expr.replace(/\s+/g, '');
+    if (!/^[0-9+\-*/.]+$/.test(expr)) {
+        throw new Error('Invalid characters');
+    }
+    const tokens = expr.match(/(?:\d+\.?\d*)|[-+*/]/g);
+    if (!tokens || tokens.length === 0) throw new Error('Invalid tokens');
+    if (tokens[0] === '-') {
+        tokens.unshift('0');
+    }
+    for (let i = 1; i < tokens.length; i++) {
+        if (tokens[i] === '-' && ['+', '-', '*', '/'].includes(tokens[i - 1])) {
+            tokens.splice(i, 1, '0', '-');
+        }
+    }
+    let i = 1;
+    while (i < tokens.length) {
+        if (tokens[i] === '*') {
+            const left = parseFloat(tokens[i - 1]);
+            const right = parseFloat(tokens[i + 1]);
+            if (isNaN(left) || isNaN(right)) throw new Error('Invalid number');
+            tokens.splice(i - 1, 3, (left * right).toString());
+        } else if (tokens[i] === '/') {
+            const left = parseFloat(tokens[i - 1]);
+            const right = parseFloat(tokens[i + 1]);
+            if (isNaN(left) || isNaN(right)) throw new Error('Invalid number');
+            if (right === 0) throw new Error('Division by zero');
+            tokens.splice(i - 1, 3, (left / right).toString());
+        } else {
+            i += 2;
+        }
+    }
+    let result = parseFloat(tokens[0]);
+    if (isNaN(result)) throw new Error('Invalid start');
+    i = 1;
+    while (i < tokens.length) {
+        if (tokens[i] === '+') {
+            result += parseFloat(tokens[i + 1]);
+        } else if (tokens[i] === '-') {
+            result -= parseFloat(tokens[i + 1]);
+        }
+        if (isNaN(parseFloat(tokens[i + 1]))) throw new Error('Invalid number');
+        i += 2;
+    }
+    return result;
+}
+
 function updateDisplay() {
     if (expression === '' || expression.trim() === '-') {
         display.textContent = '0';
@@ -24,7 +72,6 @@ function deleteLast() {
         clearAll();
         return;
     }
-
     expression = expression.slice(0, -1).trimEnd();
     if (expression.endsWith(' ')) {
         expression = expression.slice(0, -2).trimEnd();
@@ -48,11 +95,9 @@ function appendDecimal() {
         updateDisplay();
         return;
     }
-
     let parts = expression.split(/[\+\-\*\/]/);
     let lastNumber = parts[parts.length - 1].trim();
     if (lastNumber.includes('.')) return;
-
     expression += '.';
     updateDisplay();
 }
@@ -61,47 +106,37 @@ function appendOperator(op) {
     if (shouldClearOnNext) {
         shouldClearOnNext = false;
     }
-
     expression = expression.trim();
     if (/[\+\-\*\/]$/.test(expression)) {
         expression = expression.slice(0, -1);
     }
-
     expression += ' ' + op + ' ';
     updateDisplay();
 }
 
 function handlePercent() {
     if (shouldClearOnNext || expression.trim() === '') return;
-
     const match = expression.trim().match(/([+\-*\/])\s*([-\d.]+)$/);
     if (!match) return;
-
     const operator = match[1];
     const percentValue = parseFloat(match[2]);
     if (isNaN(percentValue)) return;
-
     const beforePart = expression.substring(0, match.index).trim();
     const baseMatch = beforePart.match(/([-\d.]+)$/);
     if (!baseMatch) return;
-
     const baseValue = parseFloat(baseMatch[1]);
     if (isNaN(baseValue)) return;
-
     const percentAmount = (baseValue * percentValue) / 100;
     const newExpr = beforePart.substring(0, baseMatch.index) + baseValue + operator + percentAmount;
-
     let result;
     try {
-        const cleanExpr = newExpr.replace(/\s+/g, '');
-        result = Function('"use strict"; return (' + cleanExpr + ')')();
+        result = safeEvaluate(newExpr);
         if (!isFinite(result)) throw new Error();
     } catch (e) {
         display.textContent = 'Error';
         setTimeout(clearAll, 1500);
         return;
     }
-
     expression = result.toString();
     shouldClearOnNext = true;
     updateDisplay();
@@ -110,54 +145,37 @@ function handlePercent() {
 function calculate() {
     const trimmed = expression.trim();
     if (trimmed === '' || trimmed === '-') return;
-
     let result;
     try {
-        const cleanExpr = trimmed.replace(/\s+/g, '');
-        result = Function('"use strict"; return (' + cleanExpr + ')')();
+        result = safeEvaluate(trimmed);
         if (!isFinite(result)) throw new Error();
     } catch (e) {
         display.textContent = 'Error';
         setTimeout(clearAll, 1500);
         return;
     }
-
     expression = result.toString();
     shouldClearOnNext = true;
     updateDisplay();
 }
 
-// Упрощённая и надёжная кнопка ±
 function handlePlusMinus() {
     if (shouldClearOnNext) {
         expression = '';
         shouldClearOnNext = false;
     }
-
-    // Находим последнее число в выражении
     const parts = expression.split(/[\+\-\*\/]/);
     let lastNumStr = parts[parts.length - 1].trim();
-
-    // Если последнее число пустое или только минус — ничего не делаем
     if (lastNumStr === '' || lastNumStr === '-' || lastNumStr === '0') {
         return;
     }
-
     let num = parseFloat(lastNumStr);
-
-    // Меняем знак
     num = -num;
-
-    // Заменяем последнее число на новое со знаком
     const newLastNumStr = num.toString();
-
-    // Собираем выражение обратно
     expression = expression.substring(0, expression.length - lastNumStr.length) + newLastNumStr;
-
     updateDisplay();
 }
 
-// === Кнопки ===
 document.getElementById('clear').onclick = clearAll;
 document.getElementById('delete').onclick = deleteLast;
 document.getElementById('plus_minus').onclick = handlePlusMinus;
@@ -182,7 +200,6 @@ document.getElementById('decimal').onclick = appendDecimal;
 
 document.getElementById('equals').onclick = calculate;
 
-// === Клавиатура ===
 document.addEventListener('keydown', (e) => {
     if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
     if (e.key === '.') appendDecimal();
